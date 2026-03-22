@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { MediaCard, MediaItem } from "./MediaCard";
 import { Lightbox } from "./Lightbox";
 import { useLanguage, translations, Category, CATEGORIES } from "@/contexts/LanguageContext";
@@ -33,27 +33,24 @@ export function GalleryGrid({ items, showFilters = true, initialCategory = "all"
     ? items
     : items.filter((item) => item.category === activeCategory);
 
-  const selectedIndex = selectedItem 
-    ? filteredItems.findIndex(item => item.id === selectedItem.id)
+  const selectedIndex = selectedItem
+    ? filteredItems.findIndex((item) => item.id === selectedItem.id)
     : -1;
 
   const handlePrevious = () => {
-    if (selectedIndex > 0) {
-      setSelectedItem(filteredItems[selectedIndex - 1]);
-    }
+    if (selectedIndex > 0) setSelectedItem(filteredItems[selectedIndex - 1]);
   };
 
   const handleNext = () => {
-    if (selectedIndex < filteredItems.length - 1) {
-      setSelectedItem(filteredItems[selectedIndex + 1]);
-    }
+    if (selectedIndex < filteredItems.length - 1) setSelectedItem(filteredItems[selectedIndex + 1]);
   };
 
   const allCategories: FilterCategory[] = ["all", ...CATEGORIES];
 
   return (
     <div className="space-y-8">
-      {/* Category Filters */}
+
+      {/* ── Category Filters ── */}
       {showFilters && (
         <div className="flex flex-wrap justify-center gap-2">
           {allCategories.map((cat) => (
@@ -74,24 +71,32 @@ export function GalleryGrid({ items, showFilters = true, initialCategory = "all"
         </div>
       )}
 
-      {/* Grid */}
-      <motion.div 
+      {/* ── Uniform Grid ── */}
+      <motion.div
         layout
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5"
       >
         <AnimatePresence mode="popLayout">
-          {filteredItems.map((item, index) => (
+          {filteredItems.map((item) => (
             <MediaCard
               key={item.id}
               item={item}
               onClick={() => setSelectedItem(item)}
-              aspectRatio={index % 5 === 0 ? "portrait" : index % 3 === 0 ? "video" : "square"}
             />
           ))}
         </AnimatePresence>
       </motion.div>
 
-      {/* Lightbox */}
+      {/* Empty state */}
+      {filteredItems.length === 0 && (
+        <div className="text-center py-20 text-muted-foreground">
+          <p className={cn("text-lg", isJapanese && "font-japanese")}>
+            {t({ en: "No photos in this category yet.", ja: "このカテゴリにはまだ写真がありません。" })}
+          </p>
+        </div>
+      )}
+
+      {/* ── Lightbox ── */}
       <Lightbox
         item={selectedItem}
         onClose={() => setSelectedItem(null)}

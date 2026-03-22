@@ -8,6 +8,9 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import About from "./pages/About";
+import Blogs from "./pages/Blogs";
+import BlogPost from "./pages/BlogPost";
+
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -26,7 +29,10 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/about" element={<About />} />
+              <Route path="/blog" element={<Blogs />} />
+              <Route path="/blog/:id" element={<BlogPost />} />
               <Route path="/contact" element={<Contact />} />
+              
               <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

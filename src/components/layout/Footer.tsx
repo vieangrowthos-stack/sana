@@ -20,12 +20,10 @@ export function Footer() {
       <div className="container mx-auto px-6 py-16">
         <AnimatedSection className="max-w-2xl mx-auto text-center">
           {/* Bio */}
-          <p
-            className={cn(
-              "text-muted-foreground text-lg leading-relaxed mb-8",
-              isJapanese && "font-japanese"
-            )}
-          >
+          <p className={cn(
+            "text-muted-foreground text-lg leading-relaxed mb-8",
+            isJapanese && "font-japanese"
+          )}>
             {t(translations.footer.bio)}
           </p>
 
@@ -46,11 +44,17 @@ export function Footer() {
           </div>
 
           {/* Copyright */}
-          <p className={cn(
-            "text-sm text-muted-foreground",
-            isJapanese && "font-japanese"
-          )}>
-            © {currentYear} Portfolio. {t(translations.footer.copyright)}.
+          <p className={cn("text-sm text-muted-foreground", isJapanese && "font-japanese")}>
+            © {currentYear}{" "}
+            <a
+              href="https://viean.vercel.app/"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-primary transition-colors underline underline-offset-4"
+            >
+              Viean
+            </a>
+            . {t(translations.footer.copyright)}.
           </p>
         </AnimatedSection>
       </div>
