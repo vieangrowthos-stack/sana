@@ -27,7 +27,7 @@ export default function Contact() {
     setStatus("sending");
     try {
       const data = new FormData(e.currentTarget);
-      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      const res = await fetch(`https://formspree.io/f/$mjgqwzbd`, {
         method: "POST",
         body: data,
         headers: { Accept: "application/json" },
@@ -93,7 +93,7 @@ export default function Contact() {
               </a>
 
               <a
-                href="https://instagram.com/photographer"
+                href="https://www.instagram.com/kawaicats6"
                 target="_blank"
                 rel="noreferrer"
                 className="group flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors"

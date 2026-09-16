@@ -1,83 +1,40 @@
+// src/components/gallery/GalleryGrid.tsx
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MediaCard, MediaItem } from "./MediaCard";
 import { Lightbox } from "./Lightbox";
-import { useLanguage, translations, Category, CATEGORIES } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
-
-type FilterCategory = "all" | Category;
 
 interface GalleryGridProps {
   items: MediaItem[];
-  showFilters?: boolean;
-  initialCategory?: FilterCategory;
 }
 
-const categoryLabels: Record<FilterCategory, { en: string; ja: string }> = {
-  all: translations.gallery.all,
-  landscape: translations.gallery.landscape,
-  wildlife: translations.gallery.wildlife,
-  nightscene: translations.gallery.nightscene,
-  food: translations.gallery.food,
-  travel: translations.gallery.travel,
-  portrait: translations.gallery.portrait,
-  tuffy: translations.gallery.tuffy,
-};
-
-export function GalleryGrid({ items, showFilters = true, initialCategory = "all" }: GalleryGridProps) {
-  const [activeCategory, setActiveCategory] = useState<FilterCategory>(initialCategory);
+export function GalleryGrid({ items }: GalleryGridProps) {
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
   const { t, isJapanese } = useLanguage();
 
-  const filteredItems = activeCategory === "all"
-    ? items
-    : items.filter((item) => item.category === activeCategory);
-
   const selectedIndex = selectedItem
-    ? filteredItems.findIndex((item) => item.id === selectedItem.id)
+    ? items.findIndex((item) => item.id === selectedItem.id)
     : -1;
 
   const handlePrevious = () => {
-    if (selectedIndex > 0) setSelectedItem(filteredItems[selectedIndex - 1]);
+    if (selectedIndex > 0) setSelectedItem(items[selectedIndex - 1]);
   };
 
   const handleNext = () => {
-    if (selectedIndex < filteredItems.length - 1) setSelectedItem(filteredItems[selectedIndex + 1]);
+    if (selectedIndex < items.length - 1) setSelectedItem(items[selectedIndex + 1]);
   };
-
-  const allCategories: FilterCategory[] = ["all", ...CATEGORIES];
 
   return (
     <div className="space-y-8">
-
-      {/* ── Category Filters ── */}
-      {showFilters && (
-        <div className="flex flex-wrap justify-center gap-2">
-          {allCategories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
-                isJapanese && "font-japanese",
-                activeCategory === cat
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-              )}
-            >
-              {t(categoryLabels[cat])}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* ── Uniform Grid ── */}
+      {/* Uniform Grid */}
       <motion.div
         layout
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5"
       >
         <AnimatePresence mode="popLayout">
-          {filteredItems.map((item) => (
+          {items.map((item) => (
             <MediaCard
               key={item.id}
               item={item}
@@ -88,20 +45,20 @@ export function GalleryGrid({ items, showFilters = true, initialCategory = "all"
       </motion.div>
 
       {/* Empty state */}
-      {filteredItems.length === 0 && (
+      {items.length === 0 && (
         <div className="text-center py-20 text-muted-foreground">
           <p className={cn("text-lg", isJapanese && "font-japanese")}>
-            {t({ en: "No photos in this category yet.", ja: "このカテゴリにはまだ写真がありません。" })}
+            {t({ en: "No photos in the gallery yet.", ja: "ギャラリーにまだ写真がありません。" })}
           </p>
         </div>
       )}
 
-      {/* ── Lightbox ── */}
+      {/* Lightbox */}
       <Lightbox
         item={selectedItem}
         onClose={() => setSelectedItem(null)}
         onPrevious={selectedIndex > 0 ? handlePrevious : undefined}
-        onNext={selectedIndex < filteredItems.length - 1 ? handleNext : undefined}
+        onNext={selectedIndex < items.length - 1 ? handleNext : undefined}
       />
     </div>
   );

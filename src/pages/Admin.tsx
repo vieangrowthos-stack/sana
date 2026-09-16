@@ -1,3 +1,4 @@
+// src/pages/Admin.tsx
 import { useState, useEffect } from "react";
 import {
   Image, Settings, LogIn, BookOpen, Pencil, Trash2,
@@ -5,7 +6,7 @@ import {
 } from "lucide-react";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { AnimatedSection } from "@/components/common/AnimatedSection";
-import { useLanguage, translations, CATEGORIES } from "@/contexts/LanguageContext";
+import { useLanguage, translations } from "@/contexts/LanguageContext";
 import { isConfigured, db } from "@/lib/firebase";
 import { isCloudinaryConfigured } from "@/lib/cloudinary";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import {
   collection, addDoc, getDocs, updateDoc, deleteDoc,
@@ -27,7 +27,6 @@ import { auth } from "@/lib/firebase";
 interface MediaDoc {
   id: string;
   title: string;
-  category: string;
   imageUrl: string;
   createdAt: Timestamp;
 }
@@ -54,12 +53,15 @@ function AdminLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const ADMIN_EMAIL = "viean.growthos@gmail.com";
+  const ADMIN_EMAIL = "kawaicats6@gmail.com";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (email !== ADMIN_EMAIL) { setError("You are not authorized."); return; }
+    if (email.trim().toLowerCase() !== ADMIN_EMAIL) { 
+      setError("You are not authorized."); 
+      return; 
+    }
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
@@ -106,21 +108,14 @@ function AdminLogin() {
 
 /* ─────────────────────────── PHOTOS TAB ─────────────────────────── */
 
-const CATEGORY_LABELS: Record<string, string> = {
-  landscape: "Landscape", wildlife: "Wildlife", nightscene: "Night Scene",
-  food: "Food", travel: "Travel", portrait: "Portrait", tuffy: "Tuffy",
-};
-
 function PhotosTab() {
   const [photos, setPhotos] = useState<MediaDoc[]>([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
-  const [editCategory, setEditCategory] = useState("");
   const [editImageUrl, setEditImageUrl] = useState("");
   const [editSaving, setEditSaving] = useState(false);
 
@@ -137,25 +132,27 @@ function PhotosTab() {
   useEffect(() => { fetchPhotos(); }, []);
 
   const handleAdd = async () => {
-    if (!title || !category || !imageUrl) { alert("Please fill all fields"); return; }
+    if (!imageUrl) { alert("Please provide an image URL"); return; }
     try {
       setSaving(true);
-      await addDoc(collection(db, "media"), { title, category, imageUrl, createdAt: Timestamp.now() });
-      setTitle(""); setCategory(""); setImageUrl("");
+      const finalTitle = title.trim() || "Untitled";
+      await addDoc(collection(db, "media"), { title: finalTitle, imageUrl, createdAt: Timestamp.now() });
+      setTitle(""); setImageUrl("");
       await fetchPhotos();
     } catch (e) { console.error(e); alert("Error saving photo"); }
     finally { setSaving(false); }
   };
 
   const startEdit = (p: MediaDoc) => {
-    setEditId(p.id); setEditTitle(p.title); setEditCategory(p.category); setEditImageUrl(p.imageUrl);
+    setEditId(p.id); setEditTitle(p.title || ""); setEditImageUrl(p.imageUrl);
   };
 
   const handleUpdate = async () => {
     if (!editId) return;
     try {
       setEditSaving(true);
-      await updateDoc(doc(db, "media", editId), { title: editTitle, category: editCategory, imageUrl: editImageUrl });
+      const finalEditTitle = editTitle.trim() || "Untitled";
+      await updateDoc(doc(db, "media", editId), { title: finalEditTitle, imageUrl: editImageUrl });
       setEditId(null);
       await fetchPhotos();
     } catch (e) { console.error(e); alert("Error updating photo"); }
@@ -173,28 +170,15 @@ function PhotosTab() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><Plus className="w-4 h-4" /> Add New Photo</CardTitle>
-          <CardDescription>Upload to Cloudinary first, then paste the URL below.</CardDescription>
+          <CardDescription>Paste your live image link below (Title is optional).</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Title</Label>
-              <Input placeholder="Photo title" value={title} onChange={(e) => setTitle(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat}>{CATEGORY_LABELS[cat]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label>Title / Caption (Optional)</Label>
+            <Input placeholder="Photo title (defaults to Untitled)" value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label>Cloudinary Image URL</Label>
+            <Label>Live Image URL <span className="text-destructive">*</span></Label>
             <Input placeholder="https://res.cloudinary.com/..." value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
           </div>
           {imageUrl && (
@@ -202,7 +186,7 @@ function PhotosTab() {
               <img src={imageUrl} alt="preview" className="w-full h-full object-cover" />
             </div>
           )}
-          <Button onClick={handleAdd} disabled={!title || !category || !imageUrl || saving} className="w-full md:w-auto">
+          <Button onClick={handleAdd} disabled={!imageUrl || saving} className="w-full md:w-auto">
             {saving ? "Saving..." : "Save to Gallery"}
           </Button>
         </CardContent>
@@ -223,22 +207,9 @@ function PhotosTab() {
                 <div key={p.id} className="border border-border rounded-xl overflow-hidden">
                   {editId === p.id ? (
                     <div className="p-4 space-y-3 bg-accent/20">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <Label className="text-xs">Title</Label>
-                          <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs">Category</Label>
-                          <Select value={editCategory} onValueChange={setEditCategory}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              {CATEGORIES.map((cat) => (
-                                <SelectItem key={cat} value={cat}>{CATEGORY_LABELS[cat]}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Title</Label>
+                        <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Image URL</Label>
@@ -260,12 +231,9 @@ function PhotosTab() {
                     </div>
                   ) : (
                     <div className="flex items-center gap-3 p-3">
-                      <img src={p.imageUrl} alt={p.title} className="w-16 h-12 object-cover rounded-lg flex-shrink-0" />
+                      <img src={p.imageUrl} alt={p.title || "Photo"} className="w-16 h-12 object-cover rounded-lg flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{p.title}</p>
-                        <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                          {CATEGORY_LABELS[p.category] || p.category}
-                        </span>
+                        <p className="font-medium text-sm truncate">{p.title || "Untitled"}</p>
                       </div>
                       <div className="flex gap-1 flex-shrink-0">
                         <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => startEdit(p)}>
