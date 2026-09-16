@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { GalleryGrid } from "@/components/gallery/GalleryGrid";
 import { AnimatedSection } from "@/components/common/AnimatedSection";
-import { useLanguage, translations, Category } from "@/contexts/LanguageContext";
+import { useLanguage, translations } from "@/contexts/LanguageContext";
 import { mockMediaItems } from "@/data/mockData";
 import { MediaItem } from "@/components/gallery/MediaCard";
 import { db } from "@/lib/firebase";
@@ -16,16 +15,13 @@ function firestoreToMediaItem(id: string, data: any): MediaItem {
     id,
     url: data.imageUrl || "",
     type: data.type || "photo",
-    category: data.category || "landscape",
-    caption: data.caption || { en: data.title || "", ja: data.title || "" },
+    category: "general",
+    caption: { en: data.title || "Untitled", ja: data.title || "Untitled" },
   };
 }
 
 export default function Gallery() {
   const { t, isJapanese } = useLanguage();
-  const [searchParams] = useSearchParams();
-  const categoryParam = searchParams.get("category") as Category | null;
-
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -76,11 +72,7 @@ export default function Gallery() {
               ))}
             </div>
           ) : (
-            <GalleryGrid
-              items={items}
-              showFilters
-              initialCategory={categoryParam || "all"}
-            />
+            <GalleryGrid items={items} />
           )}
         </div>
       </section>
