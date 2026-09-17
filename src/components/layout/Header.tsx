@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/", label: translations.nav.home },
-  { path: "/gallery", label: translations.nav.gallery },
+  { path: "/gallery", label: translations.nav.Gallery },
   { path: "/about", label: translations.nav.about },
   { path: "/blog", label: { en: "Blog", ja: "ブログ" } },
   { path: "/contact", label: translations.nav.contact },

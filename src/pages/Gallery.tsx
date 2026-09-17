@@ -4,7 +4,7 @@ import { GalleryGrid } from "@/components/gallery/GalleryGrid";
 import { AnimatedSection } from "@/components/common/AnimatedSection";
 import { useLanguage, translations } from "@/contexts/LanguageContext";
 import { mockMediaItems } from "@/data/mockData";
-import { MediaItem } from "@/components/gallery/MediaCard";
+import { MediaItem } from "@/components/Gallery/MediaCard";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { cn } from "@/lib/utils";
@@ -57,7 +57,7 @@ export default function Gallery() {
               "font-display text-4xl md:text-5xl font-semibold tracking-tight mb-4",
               isJapanese && "font-japanese"
             )}>
-              {t(translations.gallery.title)}
+              {t(translations.Gallery.title)}
             </h1>
           </AnimatedSection>
 

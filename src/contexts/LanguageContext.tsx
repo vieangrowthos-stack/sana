@@ -79,7 +79,7 @@ export type Category = (typeof CATEGORIES)[number];
 export const translations = {
   nav: {
     home: { en: "Home", ja: "ホーム" },
-    gallery: { en: "Gallery", ja: "ギャラリー" },
+    Gallery: { en: "Archives", ja: "アーカイブ" }, // Updated to Archives
     about: { en: "About", ja: "について" },
     contact: { en: "Contact", ja: "お問い合わせ" },
   },
@@ -96,8 +96,8 @@ export const translations = {
     featuredWork: { en: "Featured Work", ja: "注目の作品" },
     exploreAll: { en: "Explore All Photos", ja: "すべての写真を見る" },
   },
-  gallery: {
-    title: { en: "Gallery", ja: "ギャラリー" },
+  Gallery: {
+    title: { en: "Archives", ja: "アーカイブ" }, // Updated page title
     all: { en: "All", ja: "すべて" },
     landscape: { en: "Landscape", ja: "風景" },
     wildlife: { en: "Wildlife", ja: "野生動物" },

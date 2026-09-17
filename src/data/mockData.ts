@@ -1,4 +1,4 @@
-import { MediaItem } from "@/components/gallery/MediaCard";
+import { MediaItem } from "@/components/Gallery/MediaCard";
 import { BilingualText } from "@/contexts/LanguageContext";
 
 // Mock data for development - will be replaced with Firestore data
@@ -135,7 +135,7 @@ export const mockJourneyEntries: JourneyEntry[] = [
     date: "2023",
     title: { en: "First international exhibition", ja: "初の国際展示会" },
     content: { 
-      en: "My work was featured in a gallery in Tokyo. Meeting other artists was surreal.", 
+      en: "My work was featured in a Gallery in Tokyo. Meeting other artists was surreal.", 
       ja: "東京のギャラリーで作品が展示されました。" 
     },
     mediaUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",

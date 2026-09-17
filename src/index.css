@@ -57,9 +57,9 @@
     --sidebar-border: 340 25% 88%;
     --sidebar-ring: 345 35% 55%;
 
-    /* Custom gallery tokens */
-    --gallery-overlay: 340 20% 10%;
-    --gallery-caption: 10 50% 97%;
+    /* Custom Gallery tokens */
+    --Gallery-overlay: 340 20% 10%;
+    --Gallery-caption: 10 50% 97%;
   }
 
   .dark {
@@ -100,8 +100,8 @@
     --sidebar-border: 340 15% 18%;
     --sidebar-ring: 345 40% 60%;
 
-    --gallery-overlay: 340 20% 5%;
-    --gallery-caption: 340 20% 95%;
+    --Gallery-overlay: 340 20% 5%;
+    --Gallery-caption: 340 20% 95%;
   }
 }
 

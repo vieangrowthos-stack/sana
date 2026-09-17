@@ -1,6 +1,6 @@
+// src/components/Gallery/MediaCard.tsx
 import { motion } from "framer-motion";
 import { Play } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { BilingualText, useLanguage } from "@/contexts/LanguageContext";
 
 export interface MediaItem {
@@ -18,7 +18,7 @@ interface MediaCardProps {
 }
 
 export function MediaCard({ item, onClick }: MediaCardProps) {
-  const { t, isJapanese } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <motion.div
@@ -29,19 +29,15 @@ export function MediaCard({ item, onClick }: MediaCardProps) {
       transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
       whileHover="hover"
       onClick={onClick}
-      className="group relative cursor-pointer overflow-hidden rounded-xl bg-muted"
+      className="group relative cursor-pointer overflow-hidden rounded-xl bg-muted mb-4 break-inside-avoid"
     >
-      {/* 
-        aspect-[4/3] gives every card the exact same height.
-        The image uses object-cover to fill it cleanly — no blank space ever.
-        Change to aspect-square or aspect-video if you prefer those proportions.
-      */}
-      <div className="aspect-[4/3] w-full overflow-hidden">
+      {/* Natural aspect ratio wrapper for masonry grid */}
+      <div className="w-full overflow-hidden">
         {item.type === "photo" ? (
           <img
             src={item.url}
             alt={t(item.caption)}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+            className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.04]"
             loading="lazy"
           />
         ) : (
@@ -49,7 +45,7 @@ export function MediaCard({ item, onClick }: MediaCardProps) {
             <img
               src={item.thumbnailUrl || item.url}
               alt={t(item.caption)}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+              className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.04]"
               loading="lazy"
             />
             <div className="absolute inset-0 flex items-center justify-center">
@@ -61,28 +57,13 @@ export function MediaCard({ item, onClick }: MediaCardProps) {
         )}
       </div>
 
-      {/* Gradient overlay on hover */}
+      {/* Subtle hover overlay */}
       <motion.div
         initial={{ opacity: 0 }}
         variants={{ hover: { opacity: 1 } }}
         transition={{ duration: 0.25 }}
-        className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent pointer-events-none rounded-xl"
+        className="absolute inset-0 bg-black/10 pointer-events-none rounded-xl"
       />
-
-      {/* Caption on hover */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        variants={{ hover: { opacity: 1, y: 0 } }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        className="absolute bottom-0 left-0 right-0 p-4 pointer-events-none"
-      >
-        <p className={cn(
-          "text-white text-sm font-medium drop-shadow-sm",
-          isJapanese && "font-japanese"
-        )}>
-          {t(item.caption)}
-        </p>
-      </motion.div>
     </motion.div>
   );
 }

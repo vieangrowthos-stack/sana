@@ -87,7 +87,7 @@ export const lightboxContentVariants: Variants = {
   exit: { opacity: 0, scale: 0.95 },
 };
 
-// Caption fade for gallery cards
+// Caption fade for Gallery cards
 export const captionVariants: Variants = {
   initial: { opacity: 0, y: 10 },
   hover: { opacity: 1, y: 0 },

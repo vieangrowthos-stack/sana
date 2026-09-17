@@ -4,26 +4,45 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { AnimatedSection, AnimatedContainer, AnimatedItem } from "@/components/common/AnimatedSection";
-import { useLanguage, translations, Category } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
 import { mockBlogPosts, BlogPost as BlogPostType } from "@/data/blogData";
+import { mockMediaItems } from "@/data/mockData";
 
-/* ── 7 category cards split into 2 rows: 4 + 3 ── */
-const categoryCards: { key: Category; image: string }[] = [
-  { key: "landscape",  image: "https://res.cloudinary.com/dnqfkxmd4/image/upload/v1773862321/1B2A2563_lqfsez.jpg" },
-  { key: "wildlife",   image: "https://images.unsplash.com/photo-1474511320723-9a56873571b7?w=600" },
-  { key: "nightscene", image: "https://res.cloudinary.com/dnqfkxmd4/image/upload/v1774173620/1B2A2594_hahtz7.jpg" },
-  { key: "food",       image: "https://res.cloudinary.com/dnqfkxmd4/image/upload/v1769851553/1B2A6859_tcytjt.jpg" },
-  { key: "travel",     image: "https://res.cloudinary.com/dnqfkxmd4/image/upload/v1774173517/1B2A2883-2_h5ffsh.jpg" },
-  { key: "portrait",   image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600" },
-  { key: "tuffy",      image: "https://res.cloudinary.com/dnqfkxmd4/image/upload/v1774173398/1B2A5366_qbboki.jpg" },
-];
+interface GalleryPhoto {
+  id: string;
+  url: string;
+}
 
-const row1 = categoryCards.slice(0, 4); // 4 cards
-const row2 = categoryCards.slice(4);    // 3 cards — centred below
+/* ── Fetch latest 7 photos from Firestore Gallery ── */
+function useHomeGalleryPhotos() {
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const q = query(collection(db, "media"), orderBy("createdAt", "desc"), limit(7));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          setPhotos(snap.docs.map((d) => ({
+            id: d.id,
+            url: d.data().imageUrl || "",
+          })));
+        } else {
+          setPhotos(mockMediaItems.slice(0, 7).map(item => ({ id: item.id, url: item.url })));
+        }
+      } catch {
+        setPhotos(mockMediaItems.slice(0, 7).map(item => ({ id: item.id, url: item.url })));
+      }
+    };
+    fetchPhotos();
+  }, []);
+
+  return photos;
+}
 
 /* ── Fetch latest 3 blogs from Firestore ── */
 function useFeaturedBlogs() {
@@ -59,40 +78,13 @@ function useFeaturedBlogs() {
   return posts;
 }
 
-/* ── Reusable category card component ── */
-function CategoryCard({ card }: { card: typeof categoryCards[0] }) {
-  const { t, isJapanese } = useLanguage();
-  return (
-    <Link to={`/gallery?category=${card.key}`} className="block">
-      <motion.div
-        whileHover={{ y: -6 }}
-        transition={{ duration: 0.22, ease: "easeOut" }}
-        className="group relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-300"
-      >
-        <img
-          src={card.image}
-          alt={t(translations.gallery[card.key])}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300" />
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h3 className={cn(
-            "text-white text-sm md:text-base font-semibold tracking-wide",
-            isJapanese && "font-japanese"
-          )}>
-            {t(translations.gallery[card.key])}
-          </h3>
-        </div>
-      </motion.div>
-    </Link>
-  );
-}
-
 export default function Index() {
   const { t, isJapanese } = useLanguage();
+  const GalleryPhotos = useHomeGalleryPhotos();
   const featuredPosts = useFeaturedBlogs();
+
+  const row1 = GalleryPhotos.slice(0, 4); // First 4 photos
+  const row2 = GalleryPhotos.slice(4);    // Remaining photos (up to 3) centered below
 
   return (
     <PageLayout>
@@ -101,7 +93,7 @@ export default function Index() {
       <section className="relative min-h-screen flex items-center px-6 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070"
+            src="bg.jpg"
             alt="Kyoto Japan"
             className="w-full h-full object-cover"
           />
@@ -139,7 +131,7 @@ export default function Index() {
           <AnimatedSection delay={0.44}>
             <div className="flex gap-3 mt-8 flex-wrap">
               <Button asChild size="lg" className="bg-white text-black hover:bg-white/90 group rounded-full px-8">
-                <Link to="/gallery">
+                <Link to="/Gallery">
                   {t({ en: "View Portfolio", ja: "ポートフォリオを見る" })}
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition" />
                 </Link>
@@ -176,12 +168,11 @@ export default function Index() {
               <div className="relative">
                 <div className="aspect-[4/5] rounded-3xl overflow-hidden bg-muted shadow-2xl">
                   <img
-                    src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=700"
+                    src="/image.png"
                     alt="Sana Sharma"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                {/* Decorative corner accent */}
                 <div className="absolute -bottom-4 -right-4 w-32 h-32 rounded-2xl border-2 border-primary/20 -z-10" />
               </div>
             </AnimatedSection>
@@ -226,7 +217,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* ══════════════════════ FEATURED CATEGORIES ══════════════════════ */}
+      {/* ══════════════════════ FEATURED Gallery PREVIEW ══════════════════════ */}
       <section className="py-28 px-6">
         <div className="container mx-auto max-w-7xl">
 
@@ -238,39 +229,69 @@ export default function Index() {
               "font-display text-3xl md:text-4xl font-semibold",
               isJapanese && "font-japanese"
             )}>
-              {t(translations.home.featuredWork)}
+              {t({ en: "Featured Work", ja: "注目の作品" })}
             </h2>
           </AnimatedSection>
 
-          {/* Row 1 — 4 cards full width */}
+          {/* Row 1 — 4 cards */}
           <AnimatedContainer
             className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-4 md:mb-5"
             staggerDelay={0.07}
           >
-            {row1.map((card) => (
-              <AnimatedItem key={card.key}>
-                <CategoryCard card={card} />
+            {row1.map((photo) => (
+              <AnimatedItem key={photo.id}>
+                <Link to="/Gallery" className="block">
+                  <motion.div
+                    whileHover={{ y: -6 }}
+                    transition={{ duration: 0.22, ease: "easeOut" }}
+                    className="group relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-300 bg-muted"
+                  >
+                    <img
+                      src={photo.url}
+                      alt="Gallery preview"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                  </motion.div>
+                </Link>
               </AnimatedItem>
             ))}
           </AnimatedContainer>
 
-          {/* Row 2 — 3 cards, centred at 75% width so they align tidily */}
-          <AnimatedContainer
-            className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5 md:w-3/4 mx-auto"
-            staggerDelay={0.07}
-          >
-            {row2.map((card) => (
-              <AnimatedItem key={card.key}>
-                <CategoryCard card={card} />
-              </AnimatedItem>
-            ))}
-          </AnimatedContainer>
+          {/* Row 2 — up to 3 cards centered */}
+          {row2.length > 0 && (
+            <AnimatedContainer
+              className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5 md:w-3/4 mx-auto"
+              staggerDelay={0.07}
+            >
+              {row2.map((photo) => (
+                <AnimatedItem key={photo.id}>
+                  <Link to="/Gallery" className="block">
+                    <motion.div
+                      whileHover={{ y: -6 }}
+                      transition={{ duration: 0.22, ease: "easeOut" }}
+                      className="group relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-300 bg-muted"
+                    >
+                      <img
+                        src={photo.url}
+                        alt="Gallery preview"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                    </motion.div>
+                  </Link>
+                </AnimatedItem>
+              ))}
+            </AnimatedContainer>
+          )}
 
           <AnimatedSection delay={0.4} className="mt-12 text-center">
             <Button asChild variant="outline" size="lg" className="group rounded-full px-8">
-              <Link to="/gallery">
+              <Link to="/Gallery">
                 <span className={cn(isJapanese && "font-japanese")}>
-                  {t(translations.home.exploreAll)}
+                  {t({ en: "Explore All", ja: "すべて見る" })}
                 </span>
                 <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
               </Link>

@@ -1,7 +1,7 @@
-// src/components/gallery/GalleryGrid.tsx
+// src/components/Gallery/GalleryGrid.tsx
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { MediaCard, MediaItem } from "./MediaCard";
+import { MediaCard, MediaItem } from "@/components/Gallery/MediaCard";
 import { Lightbox } from "./Lightbox";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -48,7 +48,7 @@ export function GalleryGrid({ items }: GalleryGridProps) {
       {items.length === 0 && (
         <div className="text-center py-20 text-muted-foreground">
           <p className={cn("text-lg", isJapanese && "font-japanese")}>
-            {t({ en: "No photos in the gallery yet.", ja: "ギャラリーにまだ写真がありません。" })}
+            {t({ en: "No photos in the Gallery yet.", ja: "ギャラリーにまだ写真がありません。" })}
           </p>
         </div>
       )}

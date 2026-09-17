@@ -1,10 +1,10 @@
+// src/components/Gallery/Lightbox.tsx
 import { useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { MediaItem } from "./MediaCard";
+import { MediaItem } from "@/components/Gallery/MediaCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { overlayVariants, lightboxContentVariants } from "@/styles/animations";
-import { cn } from "@/lib/utils";
 
 interface LightboxProps {
   item: MediaItem | null;
@@ -14,7 +14,7 @@ interface LightboxProps {
 }
 
 export function Lightbox({ item, onClose, onPrevious, onNext }: LightboxProps) {
-  const { t, isJapanese } = useLanguage();
+  const { t } = useLanguage();
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === "Escape") onClose();
@@ -42,7 +42,7 @@ export function Lightbox({ item, onClose, onPrevious, onNext }: LightboxProps) {
           animate="animate"
           exit="exit"
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gallery-overlay/95 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-Gallery-overlay/95 backdrop-blur-sm"
           onClick={onClose}
         >
           {/* Close Button */}
@@ -51,7 +51,7 @@ export function Lightbox({ item, onClose, onPrevious, onNext }: LightboxProps) {
             className="absolute top-4 right-4 p-2 rounded-full bg-background/10 hover:bg-background/20 transition-colors z-10"
             aria-label="Close"
           >
-            <X className="w-6 h-6 text-gallery-caption" />
+            <X className="w-6 h-6 text-Gallery-caption" />
           </button>
 
           {/* Navigation Arrows */}
@@ -64,7 +64,7 @@ export function Lightbox({ item, onClose, onPrevious, onNext }: LightboxProps) {
               className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-background/10 hover:bg-background/20 transition-colors z-10"
               aria-label="Previous"
             >
-              <ChevronLeft className="w-6 h-6 text-gallery-caption" />
+              <ChevronLeft className="w-6 h-6 text-Gallery-caption" />
             </button>
           )}
 
@@ -77,7 +77,7 @@ export function Lightbox({ item, onClose, onPrevious, onNext }: LightboxProps) {
               className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-background/10 hover:bg-background/20 transition-colors z-10"
               aria-label="Next"
             >
-              <ChevronRight className="w-6 h-6 text-gallery-caption" />
+              <ChevronRight className="w-6 h-6 text-Gallery-caption" />
             </button>
           )}
 
@@ -96,29 +96,16 @@ export function Lightbox({ item, onClose, onPrevious, onNext }: LightboxProps) {
               <img
                 src={item.url}
                 alt={t(item.caption)}
-                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+                className="max-w-full max-h-[85vh] object-contain rounded-lg"
               />
             ) : (
               <video
                 src={item.url}
                 controls
                 autoPlay
-                className="max-w-full max-h-[80vh] rounded-lg"
+                className="max-w-full max-h-[85vh] rounded-lg"
               />
             )}
-
-            {/* Caption */}
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className={cn(
-                "mt-4 text-gallery-caption text-center max-w-lg",
-                isJapanese && "font-japanese"
-              )}
-            >
-              {t(item.caption)}
-            </motion.p>
           </motion.div>
         </motion.div>
       )}

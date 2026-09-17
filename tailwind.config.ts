@@ -61,9 +61,9 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        gallery: {
-          overlay: "hsl(var(--gallery-overlay))",
-          caption: "hsl(var(--gallery-caption))",
+        Gallery: {
+          overlay: "hsl(var(--Gallery-overlay))",
+          caption: "hsl(var(--Gallery-caption))",
         },
       },
       borderRadius: {

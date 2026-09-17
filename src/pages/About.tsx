@@ -67,7 +67,7 @@ export default function About() {
             <div className="grid md:grid-cols-2 gap-10 items-center">
               <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-muted">
                 <img
-                  src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=600"
+                  src="image.png"
                   alt="Sana Sharma"
                   className="w-full h-full object-cover"
                 />

@@ -27,7 +27,7 @@ const App = () => (
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/Gallery" element={<Gallery />} />
               <Route path="/about" element={<About />} />
               <Route path="/blog" element={<Blogs />} />
               <Route path="/blog/:id" element={<BlogPost />} />
